@@ -1,0 +1,227 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "aarp meditation",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "RequestPlayIntent",
+          "slots": [
+            {
+              "name": "aarpAsset",
+              "type": "asset",
+              "samples": [
+                "Into the Silence Utah",
+                "Rockpools",
+                "Behind a Waterfall",
+                "Australian Tropical Sunrise"
+              ]
+            },
+            {
+              "name": "version",
+              "type": "version",
+              "samples": [
+                "full version",
+                "full",
+                "short version",
+                "short"
+              ]
+            }
+          ],
+          "samples": [
+            "start to {aarpAsset} {version}",
+            "play the {aarpAsset} {version}"
+          ]
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PauseIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ResumeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StartOverIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.MoreIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateSettingsIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PageDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollRightIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollDownIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollLeftIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ScrollUpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.SelectIntent",
+          "samples": []
+        }
+      ],
+      "types": [
+        {
+          "values": [
+            {
+              "name": {
+                "value": "Rockpools"
+              }
+            },
+            {
+              "name": {
+                "value": "Behind a Waterfall"
+              }
+            },
+            {
+              "name": {
+                "value": "Australian Tropical Sunrise"
+              }
+            }
+          ],
+          "name": "asset"
+        },
+        {
+          "values": [
+            {
+              "name": {
+                "value": "full"
+              }
+            },
+            {
+              "name": {
+                "value": "full version"
+              }
+            },
+            {
+              "name": {
+                "value": "short version"
+              }
+            },
+            {
+              "name": {
+                "value": "long version"
+              }
+            },
+            {
+              "name": {
+                "value": "short"
+              }
+            },
+            {
+              "name": {
+                "value": "long"
+              }
+            }
+          ],
+          "name": "version"
+        }
+      ],
+      "modelConfiguration": {
+        "fallbackIntentSensitivity": {
+          "level": "LOW"
+        }
+      }
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "RequestPlayIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "aarpAsset",
+              "type": "asset",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.835208736724.1108718910346"
+              }
+            },
+            {
+              "name": "version",
+              "type": "version",
+              "elicitationRequired": true,
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.397891271650.1371044711127"
+              }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.835208736724.1108718910346",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "You can choose from Australian Tropical Sunrise long fifty minutes, Austrailian Tropical Sunrise Short seven minutes, Behind a Waterfall long eleven minutes, Behind a Waterfall short seven minutes, Rockpools long ten minutes, Rockpools short five minutes, Into the Silence Utah six minutes unguided."
+          }
+        ]
+      },
+      {
+        "id": "Elicit.Slot.397891271650.1371044711127",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Which version should I play, full version or short version?"
+          }
+        ]
+      }
+    ]
+  },
+  "version": "38"
+}

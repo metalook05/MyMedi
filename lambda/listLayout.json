@@ -1,0 +1,35 @@
+{
+  "type": "APL",
+  "version": "1.5",
+  "import": [
+    {
+      "name": "alexa-layouts",
+      "version": "1.2.0"
+    }
+  ],
+  "mainTemplate": {
+    "parameters": [
+      "listData"
+    ],
+    "items": [
+      {
+        "type": "AlexaLists",
+        "headerTitle": "${listData.headerTitle}",
+        "headerSubtitle": "${listData.headerSubtitle}",
+        "headerAttributionImage": "${listData.headerAttributionImage}",
+        "backgroundImageSource": "${listData.backgroundImageSource}",
+        "defaultImageSource": "${listData.defaultImageSource}",
+        "listItems": "${listData.listItemsToShow}",
+        "imageBlurredBackground": true,
+        "listImagePrimacy": true,
+        "primaryAction": {
+          "type": "SendEvent",
+          "arguments": [
+            "ListItemSelected",
+            "${ordinal}"
+          ]
+        }
+      }
+    ]
+  }
+}

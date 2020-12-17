@@ -1,0 +1,71 @@
+{
+    "listData": {
+        "headerTitle": "AARP Meditation",
+        "headerSubtitle": "by TecAce",
+        "headerAttributionImage": "https://aarp-meditation-asset.s3.amazonaws.com/alexa-logo.png",
+        "backgroundImageSource": "https://aarp-meditation-asset.s3.amazonaws.com/alexa-bg.png",
+        "defaultImageSource": "https://aarp-meditation-asset.s3.amazonaws.com/alexa-bg.png",
+        "listItemsToShow": [
+            {
+                "id": 1,
+                "primaryText": "Australian Tropical Sunrise",
+                "providerText": "15:01",
+                "secondaryText": "Full Version",
+                "imageSource": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/thumbnail/Australian+Tropical+Sunrise+Short_UPDATED_120720_thumbnail_small.png",
+                "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/video/Australian+Tropical+Sunrise+Long_UPDATED_120720.mp4",
+                "imageScale": "best-fill",
+                "speechMin": "long 15 minutes"
+            },
+            {
+                "id": 2,
+                "primaryText": "Australian Tropical Sunrise",
+                "providerText": "6:32",
+                "secondaryText": "Short Version",
+                "imageSource": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/thumbnail/Australian+Tropical+Sunrise+Short_UPDATED_120720_thumbnail_small.png",
+                "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/video/Australian+Tropical+Sunrise+Short_UPDATED_120720.mp4",
+                "imageScale": "best-fill",
+                "speechMin": "short 7 minutes"
+            },
+            {
+                "id": 3,
+                "primaryText": "Behind a Waterfall",
+                "providerText": "10:35",
+                "secondaryText": "Full Version",
+                "imageSource": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/thumbnail/Behind+a+Waterfall+Long_UPDATED_120720_thumbnail_small.png",
+                "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/video/Behind+a+Waterfall+Long_UPDATED_120720.mp4",
+                "imageScale": "best-fill",
+                "speechMin": "long 11 minutes"
+            },
+            {
+                "id": 4,
+                "primaryText": "Behind a Waterfall",
+                "providerText": "6:59",
+                "secondaryText": "Short Version",
+                "imageSource": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/thumbnail/Behind+a+Waterfall+Long_UPDATED_120720_thumbnail_small.png",
+                "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/video/Behind+a+Waterfall+Short_UPDATED_120720.mp4",
+                "imageScale": "best-fill",
+                "speechMin": "short 7 minutes"
+            },
+            {
+                "id": 5,
+                "primaryText": "Rockpools",
+                "providerText": "9:29",
+                "secondaryText": "Full Version",
+                "imageSource": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/thumbnail/Rockpools+Long_UPDATED_120720_thumbnail_small.png",
+                "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/video/Rockpools+Long_UPDATED_120720.mp4",
+                "imageScale": "best-fill",
+                "speechMin": "long 10 minutes"
+            },
+            {
+                "id": 6,
+                "primaryText": "Rockpools",
+                "providerText": "4:32",
+                "secondaryText": "Short Version",
+                "imageSource": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/thumbnail/Rockpools+Long_UPDATED_120720_thumbnail_small.png",
+                "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/video/Rockpools+Short_UPDATED_120720.mp4",
+                "imageScale": "best-fill",
+                "speechMin": "short 5 minutes"
+            }
+        ]
+    }
+}
