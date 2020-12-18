@@ -1,8 +1,8 @@
 {
     "listData": {
-        "headerTitle": "AARP Meditation",
-        "headerSubtitle": "by TecAce",
-        "headerAttributionImage": "https://aarp-meditation-asset.s3.amazonaws.com/alexa-logo.png",
+        "headerTitle": "Staying Sharp Meditations",
+        "headerSubtitle": "by AARP",
+        "headerAttributionImage": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/logo.png",
         "backgroundImageSource": "https://aarp-meditation-asset.s3.amazonaws.com/alexa-bg.png",
         "defaultImageSource": "https://aarp-meditation-asset.s3.amazonaws.com/alexa-bg.png",
         "listItemsToShow": [
@@ -65,6 +65,16 @@
                 "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/video/Rockpools+Short_UPDATED_120720.mp4",
                 "imageScale": "best-fill",
                 "speechMin": "short 5 minutes"
+            },
+            {
+                "id": 7,
+                "primaryText": "Into the Silence - Utah",
+                "providerText": "6:25",
+                "secondaryText": "Short Version",
+                "imageSource": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/thumbnail/audio_bg_small.png",
+                "url": "https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/mp3/Into+the+Silence+-+Utah.mp3",
+                "imageScale": "best-fill",
+                "speechMin": "short 6 minutes"
             }
         ]
     }

@@ -9,12 +9,13 @@ const ListLayout = require('./listLayout.json');
 const Data = require('./data.json');
 const StreamData = require('./stream.json');
 
-const WELECOME_SPEECH = "OK here's AARP meditation. Find a quiet, comfortable place. You can be sitting, lying down or even standing up. You just need to be able to concentrate without being too distracted. Now, select a meditation to start a session, which would you like?";
-const REPROMPT_SPEECH = "Now, select a meditation to start a session, which would you like?";
-const REPROMPT_RESELECT_SPEECH = "I can't understand. You cans say select the first one.";
-const REPROMPT_RESPEECH_AARP = "I can't understand. You cans say play the rockpools.";
-const HELP_SPEECH = "You can say open AARP meditation.";
+const WELECOME_SPEECH = "Welcome to Staying Sharp Meditations by AARP. Meditation can help you calm the mind and stay present. Now, select a meditation to start a session, which would you like?";
+const REPROMPT_SPEECH = "Now, select a meditation to start a session, which would you like? You can say select the first one";
+const REPROMPT_RESELECT_SPEECH = "I am sorry, I couldn't quite get that. Could you select one again? or you can say select the first one.";
+const REPROMPT_RESPEECH_AARP = "I am sorry, I couldn't quite get that. You cans say play the rockpools.";
+const HELP_SPEECH = "You can say open AARP meditation or play the rockpools full version.";
 const NOT_SUPPORTED_VIDEO = "Your device is not supported video.";
+const EXIT_SPEECH = "Thanks for using Staying Sharp Meditations from AARP. We hope to see you again soon.";
 
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
@@ -29,7 +30,7 @@ const LaunchRequestHandler = {
                     document: ListLayout,
                     datasources: Data
                 })
-                .reprompt(REPROMPT_SPEECH)
+                //.reprompt(REPROMPT_SPEECH)
                 .getResponse();
     }
 };
@@ -53,9 +54,9 @@ const RequestPlayIntentHandler = {
         if(index !== -1){
             let aarpData = Data.listData.listItemsToShow[index];
         
-            const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin;
+            const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin + " in 3, 2, 1";
             
-            if (supportsVideo(handlerInput)) {
+            if (supportsVideo(handlerInput) && index !== 6) {
                 handlerInput.responseBuilder.addVideoAppLaunchDirective(aarpData.url, aarpData.primaryText, aarpData.secondaryText);
                 return handlerInput.responseBuilder.speak(speakOutput).getResponse();
             } else{
@@ -90,13 +91,12 @@ const CancelAndStopIntentHandler = {
                 || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
     },
     handle(handlerInput) {
-        const speakOutput = 'Goodbye!';
-
         return handlerInput.responseBuilder
-            .speak(speakOutput)
+            .speak("good bye!")
             .getResponse();
     }
 };
+
 /* *
  * FallbackIntent triggers when a customer says something that doesn’t map to any intents in your skill
  * It must also be defined in the language model (if the locale supports it)
@@ -128,7 +128,12 @@ const SessionEndedRequestHandler = {
     handle(handlerInput) {
         console.log(`~~~~ Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`);
         // Any cleanup logic goes here.
-        return handlerInput.responseBuilder.getResponse(); // notice we send an empty response
+        console.log("handlerInput.requestEnvelope.request.reason : " + handlerInput.requestEnvelope.request.reason);
+        if(handlerInput.requestEnvelope.request.reason === "USER_INITIATED"){
+            return handlerInput.responseBuilder.speak(EXIT_SPEECH).getResponse();
+        } else{
+            return handlerInput.responseBuilder.getResponse(); // notice we send an empty response
+        }
     }
 };
 /* *

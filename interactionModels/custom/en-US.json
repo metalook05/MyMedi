@@ -46,7 +46,9 @@
         },
         {
           "name": "AMAZON.NavigateHomeIntent",
-          "samples": []
+          "samples": [
+            "exit"
+          ]
         },
         {
           "name": "AMAZON.FallbackIntent",
@@ -114,6 +116,11 @@
           "values": [
             {
               "name": {
+                "value": "Into the Silence"
+              }
+            },
+            {
+              "name": {
                 "value": "Rockpools"
               }
             },
@@ -149,17 +156,7 @@
             },
             {
               "name": {
-                "value": "long version"
-              }
-            },
-            {
-              "name": {
                 "value": "short"
-              }
-            },
-            {
-              "name": {
-                "value": "long"
               }
             }
           ],
@@ -223,5 +220,5 @@
       }
     ]
   },
-  "version": "38"
+  "version": "8"
 }
