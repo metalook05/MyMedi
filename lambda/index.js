@@ -9,7 +9,11 @@ const ListLayout = require('./listLayout.json');
 const Data = require('./data.json');
 const StreamData = require('./stream.json');
 
+const SOUND = "<audio src='https://aarp-meditation.s3-us-west-2.amazonaws.com/Media/piano.mp3'/>";
 const WELECOME_SPEECH = "Welcome to Staying Sharp Meditations by AARP. Meditation can help you calm the mind and stay present. Now, select a meditation to start a session, which would you like?";
+const WELECOME_SPEECH_NOT_APL = "Welcome to Staying Sharp Meditations by AARP. Meditation can help you calm the mind and stay present. You can choose from 1. Australian Tropical Sunrise long 15 minutes 2. Austrailian Tropical Sunrise Short 7 minutes 3. Behind a Waterfall long 11 minutes 4. Behind a Waterfall short 7 minutes 5. Rockpools long 10 minutes 6. Rockpools short 5 minutes or 7. Into the Silence - Utah 6 minutes unguided.";
+const STOP_SPEECH = "Would you like to continue with another meditation or stop for the day?";
+const BACK_SPEECH = "You can choose from 1. Australian Tropical Sunrise long 15 minutes 2. Austrailian Tropical Sunrise Short 7 minutes 3. Behind a Waterfall long 11 minutes 4. Behind a Waterfall short 7 minutes 5. Rockpools long 10 minutes 6. Rockpools short 5 minutes or 7. Into the Silence - Utah 6 minutes unguided.";
 const REPROMPT_SPEECH = "Now, select a meditation to start a session, which would you like? You can say select the first one";
 const REPROMPT_RESELECT_SPEECH = "I am sorry, I couldn't quite get that. Could you select one again? or you can say select the first one.";
 const REPROMPT_RESPEECH_AARP = "I am sorry, I couldn't quite get that. You cans say play the rockpools.";
@@ -17,27 +21,38 @@ const HELP_SPEECH = "You can say open AARP meditation or play the rockpools full
 const NOT_SUPPORTED_VIDEO = "Your device is not supported video.";
 const EXIT_SPEECH = "Thanks for using Staying Sharp Meditations from AARP. We hope to see you again soon.";
 
+let inPlaybackSession = false;
+let offsetInMilliseconds = 0;
+let audioPlayIndex = 0;
+
 const LaunchRequestHandler = {
     canHandle(handlerInput) {
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
     },
     handle(handlerInput) {
-        return handlerInput.responseBuilder
-                .speak(WELECOME_SPEECH)
+        if(supportedInterfaces("apl", handlerInput)){
+            return handlerInput.responseBuilder
+                .speak(SOUND + WELECOME_SPEECH)
                 .addDirective({
                     type: 'Alexa.Presentation.APL.RenderDocument',
                     version: '1.0',
                     document: ListLayout,
                     datasources: Data
                 })
-                //.reprompt(REPROMPT_SPEECH)
+                .reprompt(REPROMPT_SPEECH)
                 .getResponse();
+        } else{
+            return handlerInput.responseBuilder
+                .speak(WELECOME_SPEECH_NOT_APL)
+                .reprompt(REPROMPT_SPEECH)
+                .getResponse();
+        }
     }
 };
 
 const RequestPlayIntentHandler = {
     canHandle(handlerInput) {
-        console.log("RequestPlayIntentHandler");
+        console.log("[RequestPlayIntentHandler]");
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
             && Alexa.getIntentName(handlerInput.requestEnvelope) === 'RequestPlayIntent';
     },
@@ -52,15 +67,16 @@ const RequestPlayIntentHandler = {
         let index = findIndex(aarpAsset, version);
         console.log("index : " + index);
         if(index !== -1){
+            audioPlayIndex = index;
             let aarpData = Data.listData.listItemsToShow[index];
         
-            const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin + " in 3, 2, 1";
+            const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin + " in <emphasis level='strong'>3, 2, 1</emphasis>";
             
-            if (supportsVideo(handlerInput) && index !== 6) {
+            if (supportedInterfaces("video", handlerInput) && index !== 6) {
                 handlerInput.responseBuilder.addVideoAppLaunchDirective(aarpData.url, aarpData.primaryText, aarpData.secondaryText);
                 return handlerInput.responseBuilder.speak(speakOutput).getResponse();
             } else{
-                handlerInput.responseBuilder.addAudioPlayerPlayDirective("REPLACE_ALL", StreamData[index].url, StreamData[index].token, 0, null, StreamData[index].metadata);
+                handlerInput.responseBuilder.withShouldEndSession(true).addAudioPlayerPlayDirective("REPLACE_ALL", StreamData[index].url, StreamData[index].token, 0, null, StreamData[index].metadata);
                 return handlerInput.responseBuilder.speak(speakOutput).getResponse();
             }
         } else{
@@ -84,16 +100,111 @@ const HelpIntentHandler = {
     }
 };
 
-const CancelAndStopIntentHandler = {
+const BackIntentHandler = {
     canHandle(handlerInput) {
+        console.log("[BackIntentHandler] inPlaybackSession : " + inPlaybackSession);
         return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
-            && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent'
-                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.PauseIntent';
     },
     handle(handlerInput) {
+        if(supportedInterfaces("apl", handlerInput)){
+            return handlerInput.responseBuilder
+                .speak(REPROMPT_SPEECH)
+                .addDirective({
+                    type: 'Alexa.Presentation.APL.RenderDocument',
+                    version: '1.0',
+                    document: ListLayout,
+                    datasources: Data
+                })
+                .reprompt(REPROMPT_SPEECH)
+                .getResponse();
+        } else{
+            return handlerInput.responseBuilder
+                .speak(BACK_SPEECH)
+                .reprompt(REPROMPT_SPEECH)
+                .getResponse();
+        }
+    }
+};
+
+const PauseIntentHandler = {
+    canHandle(handlerInput) {
+        console.log("[PauseIntentHandler] inPlaybackSession : " + inPlaybackSession);
+        return inPlaybackSession &&
+                Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+                && (Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent'
+                || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.PauseIntent');
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder.addAudioPlayerStopDirective().getResponse();
+    }
+};
+
+const ResumeIntentHandler = {
+    canHandle(handlerInput) {
+        console.log("[ResumeIntentHandler] inPlaybackSession : " + inPlaybackSession);
+        return inPlaybackSession
+            && Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.ResumeIntent';
+    },
+    handle(handlerInput) {
+        handlerInput.responseBuilder.withShouldEndSession(true).addAudioPlayerPlayDirective("REPLACE_ALL", StreamData[audioPlayIndex].url, StreamData[audioPlayIndex].token, offsetInMilliseconds, null, StreamData[audioPlayIndex].metadata);
+        return handlerInput.responseBuilder.getResponse();
+    }
+};
+
+const YesHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+    return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.YesIntent';
+  },
+  handle(handlerInput) {
+    if(supportedInterfaces("apl", handlerInput)){
         return handlerInput.responseBuilder
-            .speak("good bye!")
+            .speak(WELECOME_SPEECH)
+            .reprompt(REPROMPT_SPEECH)
             .getResponse();
+    } else{
+        return handlerInput.responseBuilder
+            .speak(WELECOME_SPEECH)
+            .addDirective({
+                type: 'Alexa.Presentation.APL.RenderDocument',
+                version: '1.0',
+                document: ListLayout,
+                datasources: Data
+            })
+            .reprompt(REPROMPT_SPEECH)
+            .getResponse();
+    }
+  }
+};
+
+const NoHandler = {
+  canHandle(handlerInput) {
+    const request = handlerInput.requestEnvelope.request;
+
+    return request.type === 'IntentRequest' && request.intent.name === 'AMAZON.NoIntent';
+  },
+  handle(handlerInput) {
+      console.log(JSON.stringify(handlerInput));
+      if(inPlaybackSession){
+          handlerInput.responseBuilder.addAudioPlayerStopDirective();
+      }
+    return handlerInput.responseBuilder
+        .speak(EXIT_SPEECH)
+        .withShouldEndSession(true)
+        .getResponse();
+  }
+};
+
+const ExitIntentHandler = {
+    canHandle(handlerInput) {
+        console.log("[ExitIntentHandler]");
+        return Alexa.getRequestType(handlerInput.requestEnvelope) === 'IntentRequest'
+            && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.CancelIntent';
+    },
+    handle(handlerInput) {
+        return handlerInput.responseBuilder.speak(STOP_SPEECH).reprompt(STOP_SPEECH).getResponse();
     }
 };
 
@@ -147,7 +258,7 @@ const IntentReflectorHandler = {
     },
     handle(handlerInput) {
         const intentName = Alexa.getIntentName(handlerInput.requestEnvelope);
-        const speakOutput = `You just triggered ${intentName}`;
+        const speakOutput = 'You just triggered ${intentName}';
 
         return handlerInput.responseBuilder
             .speak(speakOutput)
@@ -176,7 +287,7 @@ const ErrorHandler = {
 };
 
 const sendEventHandler = {
-  canHandle(handlerInput) { 
+  canHandle(handlerInput) {
     const request = handlerInput.requestEnvelope.request;
     return request.type === 'Alexa.Presentation.APL.UserEvent' && request.arguments.length > 0;
   },
@@ -187,26 +298,62 @@ const sendEventHandler = {
       if(argumentFromSkill === "ListItemSelected"){
         let selectIdx = handlerInput.requestEnvelope.request.arguments[1];
         
-        if(selectIdx === null){
+        if(selectIdx === null || selectIdx === 0){
             selectIdx = 0;
         } else{
             selectIdx -= 1;
         }
         
+        audioPlayIndex = selectIdx;
         let aarpData = Data.listData.listItemsToShow[selectIdx];
         
-        const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin;
+        const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin + " in <emphasis level='strong'>3, 2, 1</emphasis>";
         console.log("INDEX : " + selectIdx);
         console.log(JSON.stringify(StreamData[selectIdx]));
         
-        if (supportsVideo(handlerInput)) {
+        if (supportedInterfaces("video", handlerInput) && selectIdx !== 6) {
             handlerInput.responseBuilder.addVideoAppLaunchDirective(aarpData.url, aarpData.primaryText, aarpData.secondaryText);
             return handlerInput.responseBuilder.speak(speakOutput).getResponse();
         } else{
-            handlerInput.responseBuilder.addAudioPlayerPlayDirective("REPLACE_ALL", StreamData[selectIdx].url, StreamData[selectIdx].token, 0, null, StreamData[selectIdx].metadata);
+            handlerInput.responseBuilder.withShouldEndSession(true).addAudioPlayerPlayDirective("REPLACE_ALL", StreamData[selectIdx].url, StreamData[selectIdx].token, 0, null, StreamData[selectIdx].metadata);
             return handlerInput.responseBuilder.speak(speakOutput).getResponse();
         }
      }
+  }
+};
+
+const AudioPlayerEventHandler = {
+  canHandle(handlerInput) {
+    return handlerInput.requestEnvelope.request.type.startsWith('AudioPlayer.');
+  },
+  handle(handlerInput) {
+    const audioPlayerEventName = handlerInput.requestEnvelope.request.type.split('.')[1];
+    console.log("[audioPlayerEventName] " + audioPlayerEventName);
+    switch (audioPlayerEventName) {
+      case 'PlaybackStarted':
+        inPlaybackSession = true;
+        break;
+      case 'PlaybackFinished':
+        inPlaybackSession = false;
+        offsetInMilliseconds = 0;
+        audioPlayIndex = 0;
+        break;
+      case 'PlaybackStopped':
+          offsetInMilliseconds = getOffsetInMilliseconds(handlerInput);
+        break;
+      case 'PlaybackNearlyFinished':
+          break;
+      case 'PlaybackFailed':
+        inPlaybackSession = false;
+        offsetInMilliseconds = 0;
+        audioPlayIndex = 0;
+        console.log('Playback Failed : %j', handlerInput.requestEnvelope.request.error);
+        return;
+      default:
+        throw new Error('Should never reach here!');
+    }
+
+    return handlerInput.responseBuilder.getResponse();
   }
 };
 
@@ -222,16 +369,17 @@ const SelectIntentHandler = {
       
       if(valueList.hasOwnProperty("value")){
             let idx = valueList.value-1;
+            audioPlayIndex = idx;
             let aarpData = Data.listData.listItemsToShow[idx];
-            const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin;
+            const speakOutput = "Ok, starting " + aarpData.primaryText +" "+ aarpData.speechMin + " in <emphasis level='strong'>3, 2, 1</emphasis>";
           
-            if (supportsVideo(handlerInput)) {
+            if (supportedInterfaces("video", handlerInput) && idx !== 6) {
                 console.log("Play Video");
                 handlerInput.responseBuilder.addVideoAppLaunchDirective(aarpData.url, aarpData.primaryText, aarpData.secondaryText);
                 return handlerInput.responseBuilder.speak(speakOutput).getResponse();
             } else{
                 console.log("Play Audio");
-                handlerInput.responseBuilder.addAudioPlayerPlayDirective("REPLACE_ALL", StreamData[idx].url, StreamData[idx].token, 0, null, StreamData[idx].metadata);
+                handlerInput.responseBuilder.withShouldEndSession(true).addAudioPlayerPlayDirective("REPLACE_ALL", StreamData[idx].url, StreamData[idx].token, 0, null, StreamData[idx].metadata);
                 return handlerInput.responseBuilder.speak(speakOutput).getResponse();
             }
       } else{
@@ -240,17 +388,29 @@ const SelectIntentHandler = {
   }
 };
 
-function supportsVideo(handlerInput) {
-  var hasVideo =
-    handlerInput.requestEnvelope.context &&
-    handlerInput.requestEnvelope.context.System &&
-    handlerInput.requestEnvelope.context.System.device &&
-    handlerInput.requestEnvelope.context.System.device.supportedInterfaces &&
-    handlerInput.requestEnvelope.context.System.device.supportedInterfaces.VideoApp
-
-  console.log("Supported Interfaces are" + JSON.stringify(handlerInput.requestEnvelope.context.System.device.supportedInterfaces));
-  console.log("hasDisplay : " + JSON.stringify(hasVideo));
-  return hasVideo;
+function supportedInterfaces(checkInterface, handlerInput) {
+    console.log("Supported Interfaces are" + JSON.stringify(handlerInput.requestEnvelope.context.System.device.supportedInterfaces));
+    if(checkInterface === "video"){
+        var hasVideo =
+            handlerInput.requestEnvelope.context &&
+            handlerInput.requestEnvelope.context.System &&
+            handlerInput.requestEnvelope.context.System.device &&
+            handlerInput.requestEnvelope.context.System.device.supportedInterfaces &&
+            handlerInput.requestEnvelope.context.System.device.supportedInterfaces.VideoApp
+        
+        console.log("hasVideo : " + JSON.stringify(hasVideo));
+        return hasVideo;
+    } else if(checkInterface === "apl"){
+        var hasAPL =
+            handlerInput.requestEnvelope.context &&
+            handlerInput.requestEnvelope.context.System &&
+            handlerInput.requestEnvelope.context.System.device &&
+            handlerInput.requestEnvelope.context.System.device.supportedInterfaces &&
+            handlerInput.requestEnvelope.context.System.device.supportedInterfaces["Alexa.Presentation.APL"]
+        
+        console.log("hasAPL : " + JSON.stringify(hasAPL));
+        return hasAPL;
+    }
 }
 
 function findIndex(aarp, version){
@@ -271,6 +431,12 @@ function findIndex(aarp, version){
     return  -1;
 }
 
+function getOffsetInMilliseconds(handlerInput) {
+  // Extracting offsetInMilliseconds received in the request.
+  return handlerInput.requestEnvelope.request.offsetInMilliseconds;
+}
+
+
 /**
  * This handler acts as the entry point for your skill, routing all request and response
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
@@ -280,10 +446,16 @@ exports.handler = Alexa.SkillBuilders.custom()
     .addRequestHandlers(
         LaunchRequestHandler,
         RequestPlayIntentHandler,
+        AudioPlayerEventHandler,
         SelectIntentHandler,
         sendEventHandler,
+        BackIntentHandler,
+        YesHandler,
+        NoHandler,
         HelpIntentHandler,
-        CancelAndStopIntentHandler,
+        ResumeIntentHandler,
+        PauseIntentHandler,
+        ExitIntentHandler,
         FallbackIntentHandler,
         SessionEndedRequestHandler,
         IntentReflectorHandler)

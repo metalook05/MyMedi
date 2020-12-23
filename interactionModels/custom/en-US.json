@@ -109,6 +109,30 @@
         {
           "name": "AMAZON.SelectIntent",
           "samples": []
+        },
+        {
+          "name": "AMAZON.YesIntent",
+          "samples": [
+            "Yes",
+            "another meditation",
+            "continue with another meditation"
+          ]
+        },
+        {
+          "name": "AMAZON.NoIntent",
+          "samples": [
+            "no",
+            "stop for the day"
+          ]
+        },
+        {
+          "name": "BackIntent",
+          "slots": [],
+          "samples": [
+            "show me the meditation list",
+            "go to back",
+            "back"
+          ]
         }
       ],
       "types": [
@@ -220,5 +244,5 @@
       }
     ]
   },
-  "version": "8"
+  "version": "16"
 }
