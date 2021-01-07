@@ -22,11 +22,13 @@
         "listItems": "${listData.listItemsToShow}",
         "imageBlurredBackground": true,
         "listImagePrimacy": true,
+        "imageMetadataPrimacy": true,
+        "touchForward": true,
         "primaryAction": {
           "type": "SendEvent",
           "arguments": [
-            "ListItemSelected",
-            "${ordinal}"
+            "listItemPressed",
+            "${index}"
           ]
         }
       }

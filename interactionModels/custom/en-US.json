@@ -114,7 +114,6 @@
           "name": "AMAZON.YesIntent",
           "samples": [
             "Yes",
-            "another meditation",
             "continue with another meditation"
           ]
         },
@@ -129,9 +128,7 @@
           "name": "BackIntent",
           "slots": [],
           "samples": [
-            "show me the meditation list",
-            "go to back",
-            "back"
+            "i want to another mediation video "
           ]
         }
       ],
@@ -244,5 +241,5 @@
       }
     ]
   },
-  "version": "16"
+  "version": "21"
 }
